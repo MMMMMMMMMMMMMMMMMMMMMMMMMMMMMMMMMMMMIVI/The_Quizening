@@ -1,0 +1,27 @@
+# The Quizening — CLI Quiz Buzzer Tool
+
+## Run
+
+```bash
+python quizening.py
+```
+
+## Commands
+
+### PREPARE phase
+| Command | Effect |
+|---|---|
+| `name 1 Alice` | Assign name to button 1 |
+| `b1` / `b2` / `b3` / `b4` | Simulate a buzzer press (dev/test only) |
+| `start` | Begin the quiz |
+
+### QUIZ phase
+| Command | Effect |
+|---|---|
+| `next` or `n` | Start the next round |
+| `end` or `e` | End the quiz, show ranking |
+| `Alice +1` | Give Alice a point |
+| `Alice -1` | Take a point from Alice |
+
+## Screenshots
+
