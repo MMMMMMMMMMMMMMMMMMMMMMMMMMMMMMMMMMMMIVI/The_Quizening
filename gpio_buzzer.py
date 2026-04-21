@@ -61,7 +61,7 @@ def teardown_gpio() -> None:
     _buttons.clear()
 
 def play_sound(idx: int) -> None:
-    path = "./sound/whomp-sound.pm3"
+    path = "/home/pi/Desktop/The_Quizening/sound/whomp-sound.pm3"
     # if idx == 1:
     #     path = "./sounds/sound1.mp3"
     # elif idx == 2:
