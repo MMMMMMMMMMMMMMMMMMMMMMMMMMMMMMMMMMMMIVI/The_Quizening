@@ -21,7 +21,7 @@ class Player:
 class GameState:
     def __init__(self) -> None:
         self.phase         = Phase.PREPARE
-        self.players       = [Player(f"Button {i}", i) for i in range(1, 5)]
+        self.players       = [Player(f"Player {i}", i) for i in range(1, 5)]
         self.round_number  = 0
         self.buzzer_order: list[int] = []
         self._log: list[str]         = []
