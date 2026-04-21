@@ -12,7 +12,7 @@ blue_button = Button(20)
 blue_led = PWMLED(19)
 
 yellow_button = Button(21)
-yellow_led = LED(12)
+yellow_led = PWMLED(12)
     
 red_button.when_pressed = red_led.on
 red_button.when_released = red_led.off
