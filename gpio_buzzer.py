@@ -16,6 +16,7 @@ still works in that case.
 """
 from __future__ import annotations
 from game import GameState
+from subprocess import Popen
 
 _buttons = []   # keep references alive so gpiozero doesn't GC them
 
@@ -44,6 +45,7 @@ def setup_gpio(game: GameState) -> bool:
             def on_press():
                 game.buzz_queue.put(idx)   # thread-safe
                 led.blink(on_time=0.1, off_time=0.1, n=3)
+                play_sound(idx)
             return on_press
 
         btn.when_pressed  = make_press_cb(player_index, leds[i])
@@ -57,3 +59,15 @@ def teardown_gpio() -> None:
     for btn in _buttons:
         btn.close()
     _buttons.clear()
+
+def play_sound(idx: int) -> None:
+    path = "./sound/whomp-sound.pm3"
+    # if idx == 1:
+    #     path = "./sounds/sound1.mp3"
+    # elif idx == 2:
+    #     path = "./sounds/sound2.mp3"
+    # elif idx == 1:
+    #     path = "./sounds/sound3.mp3"
+    # if idx == 1:
+    #     path = "./sounds/sound4.mp3"
+    Popen(["aplay", path])
