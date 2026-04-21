@@ -16,7 +16,7 @@ still works in that case.
 """
 from __future__ import annotations
 from game import GameState
-from subprocess import Popen
+from playsound import playsound
 
 _buttons = []   # keep references alive so gpiozero doesn't GC them
 
@@ -61,7 +61,7 @@ def teardown_gpio() -> None:
     _buttons.clear()
 
 def play_sound(idx: int) -> None:
-    path = "/home/pi/Desktop/The_Quizening/sound/whomp-sound.pm3"
+    path = '/home/pi/Desktop/The_Quizening/sound/whomp-sound.pm3'
     # if idx == 1:
     #     path = "./sounds/sound1.mp3"
     # elif idx == 2:
@@ -70,4 +70,4 @@ def play_sound(idx: int) -> None:
     #     path = "./sounds/sound3.mp3"
     # if idx == 1:
     #     path = "./sounds/sound4.mp3"
-    Popen(["aplay", path])
+    playsound(path)
