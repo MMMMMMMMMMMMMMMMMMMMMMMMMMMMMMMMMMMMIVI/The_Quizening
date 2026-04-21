@@ -1,4 +1,4 @@
-playsound;
+playsound3;
 
 # ── Windows only ─────────────────────────────────────────────────────────────
 # curses is built into Python on Linux/macOS but missing on Windows.

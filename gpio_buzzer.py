@@ -16,7 +16,7 @@ still works in that case.
 """
 from __future__ import annotations
 from game import GameState
-from playsound import playsound
+from playsound3 import playsound
 
 _buttons = []   # keep references alive so gpiozero doesn't GC them
 
