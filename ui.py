@@ -43,12 +43,13 @@ def init_colors() -> None:
 # ── Layout ────────────────────────────────────────────────────────────────────
 
 SCORE_H = 5    # title row + blank + name row + score row + divider
-LOG_H   = 9    # 1 header row + 8 log lines
+LOG_H   = 16    # 1 header row + 8 log lines
 INPUT_H = 1    # single command line at the bottom
 
 
 def create_windows(stdscr):
     """Return (win_scores, win_main, win_log, win_input). Call again on resize."""
+    curses.halfdelay(1)
     rows, cols = stdscr.getmaxyx()
     main_h = max(3, rows - SCORE_H - LOG_H - INPUT_H)
 
@@ -86,7 +87,7 @@ def _addstr_safe(win, y: int, x: int, text: str, attr: int = 0) -> None:
 
 # ── draw_scores ───────────────────────────────────────────────────────────────
 
-def draw_scores(win, players: list[Player]) -> None:
+def draw_scores(win, players: list[Player], flash_idx: int | None = None) -> None:
     win.erase()
     rows, cols = win.getmaxyx()
 
@@ -116,6 +117,10 @@ def draw_scores(win, players: list[Player]) -> None:
                     win.addch(row, x - 1, curses.ACS_VLINE, curses.color_pair(C_ACCENT))
                 except curses.error:
                     pass
+
+         # Flash: reverse video when this player just buzzed
+        if flash_idx is not None and p.button_index == flash_idx:
+            attr = attr | curses.A_REVERSE
 
         name = p.name[:card_w - 2]
         name_x = x + max(0, (card_w - len(name)) // 2)
@@ -191,64 +196,30 @@ def draw_log(win, messages: list[str]) -> None:
     win.refresh()
 
 
-# ── get_command ───────────────────────────────────────────────────────────────
+# ── draw_input ───────────────────────────────────────────────────────────────
 
-def get_command(win, hint: str = "") -> str:
-    """
-    Block until the user presses Enter. Returns the typed string.
-    Handles backspace and resize events (returns "" on resize so caller can
-    recreate windows).
-    """
+def draw_input(win, buffer: list[str], hint: str = "") -> None:
+    """Draw the current input buffer. Called every frame."""
     _, cols = win.getmaxyx()
-    prompt  = "> "
-    prompt_attr = curses.color_pair(C_INPUT) | curses.A_BOLD
-
-    curses.curs_set(1)
+    prompt = "> "
     win.erase()
-    _addstr_safe(win, 0, 0, prompt, prompt_attr)
+    win.addstr(0, 0, prompt, curses.color_pair(C_INPUT) | curses.A_BOLD)
 
-    # Hint text (right-aligned, dimmed)
+    text = "".join(buffer)
+    win.addstr(0, len(prompt), text, curses.color_pair(C_DIM))
+
     if hint:
-        hint_trimmed = hint[:cols - len(prompt) - 2]
-        _addstr_safe(win, 0, cols - len(hint_trimmed) - 1,
-                     hint_trimmed, curses.color_pair(C_DIM) | curses.A_DIM)
+        trimmed = hint[:cols - len(prompt) - len(text) - 2]
+        if trimmed:
+            win.addstr(0, cols - len(trimmed) - 1,
+                       trimmed, curses.color_pair(C_DIM) | curses.A_DIM)
+
+    # Place the real cursor at end of typed text
+    cursor_x = min(len(prompt) + len(buffer), cols - 1)
+    try:
+        curses.curs_set(1)
+        win.move(0, cursor_x)
+    except curses.error:
+        pass
 
     win.refresh()
-
-    buffer   = []
-    cursor_x = len(prompt)
-
-    while True:
-        try:
-            ch = win.getch(0, min(cursor_x, cols - 1))
-        except curses.error:
-            continue
-
-        if ch == curses.KEY_RESIZE:
-            curses.curs_set(0)
-            return "\x00RESIZE"   # sentinel so main loop can handle it
-
-        if ch in (curses.KEY_ENTER, 10, 13):
-            break
-
-        if ch in (curses.KEY_BACKSPACE, 127, 8):
-            if buffer:
-                buffer.pop()
-                cursor_x -= 1
-                try:
-                    win.addch(0, cursor_x, " ")
-                except curses.error:
-                    pass
-                win.refresh()
-
-        elif 32 <= ch <= 126 and cursor_x < cols - 1:
-            buffer.append(chr(ch))
-            try:
-                win.addch(0, cursor_x, ch)
-            except curses.error:
-                pass
-            cursor_x += 1
-            win.refresh()
-
-    curses.curs_set(0)
-    return "".join(buffer)

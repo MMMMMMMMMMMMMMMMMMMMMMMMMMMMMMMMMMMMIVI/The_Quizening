@@ -26,6 +26,7 @@ class GameState:
         self.buzzer_order: list[int] = []
         self._log: list[str]         = []
         self.buzz_queue: queue.Queue[int] = queue.Queue()   # thread-safe GPIO feed
+        self.last_flash: int | None = None
 
     # ── Logging ──────────────────────────────────────────────────────────────
 

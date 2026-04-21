@@ -13,7 +13,7 @@ import curses
 import queue
 
 from game     import GameState, Phase
-from ui       import init_colors, create_windows, draw_scores, draw_main, draw_log, get_command
+from ui       import init_colors, create_windows, draw_scores, draw_main, draw_log
 from commands import process
 from gpio_buzzer import setup_gpio, teardown_gpio
 
@@ -44,46 +44,60 @@ def main(stdscr) -> None:
     wins = create_windows(stdscr)   # (win_scores, win_main, win_log, win_input)
 
     try:
+        input_buf = [] 
+
         while True:
             win_scores, win_main, win_log, win_input = wins
 
             # Drain any buzzer presses that arrived via GPIO while we were blocked
+            changed = False
             while True:
                 try:
                     idx = game.buzz_queue.get_nowait()
                     game.register_buzz(idx)
+                    game.last_flash = idx          # new field, see game.py
+                    changed = True
                 except queue.Empty:
                     break
 
-            # Redraw everything
-            draw_scores(win_scores, game.players)
+            # Redraw if something changed or first frame
+            draw_scores(win_scores, game.players, game.last_flash)
             draw_main(win_main, game)
-            draw_log(win_log, game.last_log(7))
+            draw_log(win_log, game.last_log(20))
+            draw_input(win_input, input_buf, _HINTS[game.phase])
 
-            # Block on input
-            cmd = get_command(win_input, hint=_HINTS[game.phase])
+            # Non-blocking getch (timeout set in create_windows)
+            ch = win_input.getch()
 
-            # Handle resize sentinel
-            if cmd == "\x00RESIZE":
+            if ch == curses.KEY_RESIZE:
                 stdscr.clear()
                 stdscr.refresh()
                 wins = create_windows(stdscr)
+                input_buf = []
                 continue
 
-            # Process command
-            process(game, cmd)
+            elif ch in (curses.KEY_ENTER, 10, 13):
+                cmd = "".join(input_buf).strip()
+                input_buf = []
+                if game.last_flash is not None:
+                    game.last_flash = None
+                process(game, cmd)
+                if game.phase == Phase.END:
+                    draw_scores(win_scores, game.players, None)
+                    draw_main(win_main, game)
+                    draw_log(win_log, game.last_log(20))
+                    win_input.erase()
+                    win_input.addstr(0, 0, "  Press any key to exit...")
+                    win_input.refresh()
+                    win_input.getch()
+                    break
 
-            # Exit after the end screen has been drawn once
-            if game.phase == Phase.END:
-                # Redraw one final time so the ranking is visible
-                draw_scores(win_scores, game.players)
-                draw_main(win_main, game)
-                draw_log(win_log, game.last_log(7))
-                win_input.erase()
-                win_input.addstr(0, 0, "  Press any key to exit...")
-                win_input.refresh()
-                win_input.getch()
-                break
+            elif ch in (curses.KEY_BACKSPACE, 127, 8):
+                if input_buf:
+                    input_buf.pop()
+
+            elif ch != -1 and 32 <= ch <= 126:
+                input_buf.append(chr(ch))
 
     finally:
         teardown_gpio()
