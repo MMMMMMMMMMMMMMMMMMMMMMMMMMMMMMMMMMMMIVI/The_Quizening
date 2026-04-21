@@ -43,7 +43,7 @@ def setup_gpio(game: GameState) -> bool:
         def make_press_cb(idx, led):
             def on_press():
                 game.buzz_queue.put(idx)   # thread-safe
-                led.blink(on_time=0.1, off_time=0.1, n=5)
+                led.blink(on_time=0.1, off_time=0.1, n=3)
             return on_press
 
         btn.when_pressed  = make_press_cb(player_index, leds[i])

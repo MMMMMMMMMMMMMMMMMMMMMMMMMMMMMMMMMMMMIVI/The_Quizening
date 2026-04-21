@@ -28,10 +28,10 @@ MEDALS        = ("1.", "2.", "3.", "4.")
 def init_colors() -> None:
     curses.start_color()
     curses.use_default_colors()          # -1 = terminal's own background
-    curses.init_pair(C_P1,     curses.COLOR_CYAN,    -1)
+    curses.init_pair(C_P1,     curses.COLOR_BLUE,    -1)
     curses.init_pair(C_P2,     curses.COLOR_GREEN,   -1)
     curses.init_pair(C_P3,     curses.COLOR_YELLOW,  -1)
-    curses.init_pair(C_P4,     curses.COLOR_MAGENTA, -1)
+    curses.init_pair(C_P4,     curses.COLOR_RED, -1)
     curses.init_pair(C_TITLE,  curses.COLOR_WHITE,   curses.COLOR_BLUE)
     curses.init_pair(C_ACCENT, curses.COLOR_BLUE,    -1)
     curses.init_pair(C_DIM,    curses.COLOR_WHITE,   -1)
@@ -43,7 +43,7 @@ def init_colors() -> None:
 # ── Layout ────────────────────────────────────────────────────────────────────
 
 SCORE_H = 5    # title row + blank + name row + score row + divider
-LOG_H   = 26    # 1 header row + 8 log lines
+LOG_H   = 26    # 1 header row + 25 log lines
 INPUT_H = 1    # single command line at the bottom
 
 
@@ -161,7 +161,7 @@ def draw_main(win, game: GameState) -> None:
         _addstr_safe(win, 3, 2, "Buzz order:", curses.A_BOLD)
         for i, idx in enumerate(game.buzzer_order):
             p     = game.player(idx)
-            name  = p.name if p else f"Button {idx}"
+            name  = p.name if p else f"Player {idx}"
             medal = MEDALS[min(i, len(MEDALS) - 1)]
             color = curses.color_pair(BUZZ_COLORS[min(i, len(BUZZ_COLORS) - 1)])
             row   = 4 + i
