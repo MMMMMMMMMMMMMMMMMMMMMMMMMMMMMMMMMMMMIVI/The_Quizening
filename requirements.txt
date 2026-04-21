@@ -1,0 +1,10 @@
+# ── Windows only ─────────────────────────────────────────────────────────────
+# curses is built into Python on Linux/macOS but missing on Windows.
+# Install this when developing on Windows; do NOT install it on the Pi.
+windows-curses; sys_platform == "win32"
+
+# ── Raspberry Pi only ────────────────────────────────────────────────────────
+# GPIO control for the physical buzzers and LEDs.
+# Usually pre-installed on Raspberry Pi OS; safe to install manually if not.
+# Not needed on a dev machine — the code detects its absence automatically.
+gpiozero; sys_platform == "linux"
