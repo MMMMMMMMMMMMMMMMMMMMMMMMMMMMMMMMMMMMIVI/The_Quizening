@@ -13,7 +13,7 @@ import curses
 import queue
 
 from game     import GameState, Phase
-from ui       import init_colors, create_windows, draw_scores, draw_main, draw_log
+from ui       import init_colors, create_windows, draw_scores, draw_main, draw_log, draw_input
 from commands import process
 from gpio_buzzer import setup_gpio, teardown_gpio
 
