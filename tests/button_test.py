@@ -1,18 +1,18 @@
-from gpiozero import Button, LED
+from gpiozero import Button, PWMLED
 from signal import pause
 from time import sleep
 
-red_button = Button(12)
-red_led = LED(6)
+red_button = Button(26)
+red_led = PWMLED(18)
 
 green_button = Button(16)
-green_led = LED(13)
+green_led = PWMLED(13)
 
 blue_button = Button(20)
-blue_led = LED(19)
+blue_led = PWMLED(19)
 
 yellow_button = Button(21)
-yellow_led = LED(26)
+yellow_led = LED(12)
     
 red_button.when_pressed = red_led.on
 red_button.when_released = red_led.off

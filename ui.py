@@ -43,7 +43,7 @@ def init_colors() -> None:
 # ── Layout ────────────────────────────────────────────────────────────────────
 
 SCORE_H = 5    # title row + blank + name row + score row + divider
-LOG_H   = 16    # 1 header row + 8 log lines
+LOG_H   = 26    # 1 header row + 8 log lines
 INPUT_H = 1    # single command line at the bottom
 
 
