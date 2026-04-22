@@ -26,16 +26,15 @@ blue_led = PWMLED(19)
 yellow_button = Button(21)
 yellow_led = PWMLED(12)
 
-red_button.when_pressed = lambda:[red_led.on, blue_led.on]
-red_button.when_released = lambda:[red_led.off, blue_led.off]
+red_button.when_pressed = red_led.on
+red_button.when_released = red_led.off
 
 green_button.when_pressed = green_led.on
 green_button.when_released = green_led.off
 
 blue_button.when_pressed = blicki(blue_led)
 
-yellow_button.when_pressed = yellow_led.on
-yellow_button.when_released = yellow_led.off
+yellow_button.when_pressed = yellow_led.blink(on_time=0.1, off_time=0.1, n=3)
 
 """while True:
     yellow_led.on()
