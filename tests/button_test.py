@@ -2,6 +2,15 @@ from gpiozero import Button, PWMLED
 from signal import pause
 from time import sleep
 
+def blicki(led):
+    def _run():
+        for _ in range(3):
+            led.on()
+            sleep(0.1)
+            led.off()
+            sleep(0.1)
+    return _run
+
 red_button = Button(26)
 red_led = PWMLED(18)
 
@@ -20,8 +29,7 @@ red_button.when_released = red_led.off
 green_button.when_pressed = green_led.on
 green_button.when_released = green_led.off
 
-blue_button.when_pressed = blue_led.on
-blue_button.when_released = blue_led.off
+blue_button.when_pressed = blicki(blue_led)
 
 yellow_button.when_pressed = yellow_led.on
 yellow_button.when_released = yellow_led.off
