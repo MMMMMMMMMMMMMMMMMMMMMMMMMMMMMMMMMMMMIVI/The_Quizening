@@ -1,6 +1,9 @@
-from gpiozero import Button, PWMLED
+from gpiozero import Button, PWMLED, TonalBuzzer
 from signal import pause
 from time import sleep
+from gpiozero.tones import Tone
+
+b = TonalBuzzer(23)
 
 def blicki(led):
     def _run():
@@ -22,9 +25,9 @@ blue_led = PWMLED(19)
 
 yellow_button = Button(21)
 yellow_led = PWMLED(12)
-    
-red_button.when_pressed = red_led.on
-red_button.when_released = red_led.off
+
+red_button.when_pressed = lambda:[red_led.on, blue_led.on]
+red_button.when_released = lambda:[red_led.off, blue_led.off]
 
 green_button.when_pressed = green_led.on
 green_button.when_released = green_led.off
