@@ -20,8 +20,8 @@ import threading
 
 _buttons = []   # keep references alive so gpiozero doesn't GC them
 
-BUZZER_PINS = [26, 16, 20, 21]   # BCM pin numbers, one per player
-LED_PINS    = [6,  13, 19, 12]   # matching LEDs (one per buzzer)
+BUZZER_PINS = [25, 16, 20, 21]   # BCM pin numbers, one per player
+LED_PINS    = [6,  13, 19, 26]   # matching LEDs (one per buzzer)
 TONE_PIN = 18
 PLAYER_TONES = {
     1: 523,# C5
