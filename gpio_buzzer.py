@@ -21,9 +21,14 @@ import threading
 _buttons = []   # keep references alive so gpiozero doesn't GC them
 
 BUZZER_PINS = [26, 16, 20, 21]   # BCM pin numbers, one per player
-LED_PINS    = [18,  13, 19, 12]   # matching LEDs (one per buzzer)
-TONE_PIN = 23
-PLAYER_TONES = {1: 523, 2: 659, 3: 784, 4: 988,}# C5 E5 G5 B5
+LED_PINS    = [6,  13, 19, 12]   # matching LEDs (one per buzzer)
+TONE_PIN = 18
+PLAYER_TONES = {
+    1: 523,# C5
+    2: 659,# E5
+    3: 784,# G5
+    4: 988,# B5
+    }
 
 
 def setup_gpio(game: GameState) -> bool:
@@ -48,10 +53,16 @@ def setup_gpio(game: GameState) -> bool:
             def on_press():
                 game.buzz_queue.put(idx)   # thread-safe
                 beep(bzr, frequency=PLAYER_TONES[idx], duration=0.15)
-                led.blink(on_time=0.1, off_time=0.1, n=3)
+                blinkini(led, on_time=0.05, off_time=0.05, n=3)
             return on_press
+        
+        def make_release_cb(led):
+            def on_release():
+                led.off()   # ensure it ends up off
+            return on_release
 
         btn.when_pressed  = make_press_cb(player_index, leds[i], buzz)
+        btn.when_released = make_release_cb(leds[i])
         _buttons.append(btn)
 
     return True
@@ -69,4 +80,14 @@ def beep(buzzer, frequency=440, duration=0.15):
         buzzer.play(frequency)
         threading.Event().wait(duration)
         buzzer.stop()
+    threading.Thread(target=_run, daemon=True).start()
+
+def blinkini(led, on_time=0.05, off_time=0.05, n=3) -> None:
+    """Software blink — works on any GPIO pin, no PWM required."""
+    def _run():
+        for _ in range(n):
+            led.on()
+            threading.Event().wait(on_time)
+            led.off()
+            threading.Event().wait(off_time)
     threading.Thread(target=_run, daemon=True).start()
