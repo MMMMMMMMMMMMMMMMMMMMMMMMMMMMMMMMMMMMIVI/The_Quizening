@@ -23,13 +23,6 @@ _buttons = []   # keep references alive so gpiozero doesn't GC them
 BUZZER_PINS = [25, 16, 20, 21]   # BCM pin numbers, one per player
 LED_PINS    = [6,  13, 19, 26]   # matching LEDs (one per buzzer)
 TONE_PIN = 18
-# PLAYER_TONES = {
-#     1: 523,# C5
-#     2: 659,# E5
-#     3: 784,# G5
-#     4: 988,# B5
-#     }
-
 PLAYER_TONES = {
     1: 494,# B4
     2: 523,# C5

@@ -126,7 +126,7 @@ def draw_scores(win, players: list[Player], flash_idx: int | None = None) -> Non
         name_x = x + max(0, (card_w - len(name)) // 2)
         _addstr_safe(win, 2, name_x, name, attr)
 
-        score_str = f"{p.score} pts"
+        score_str = f"{p.score_display:g} pts"
         score_x = x + max(0, (card_w - len(score_str)) // 2)
         _addstr_safe(win, 3, score_x, score_str, curses.color_pair(C_DIM))
 

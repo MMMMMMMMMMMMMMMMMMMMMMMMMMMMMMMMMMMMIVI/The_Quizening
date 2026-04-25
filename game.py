@@ -17,6 +17,11 @@ class Player:
     button_index: int   # 1–4
     score: int = 0
 
+    @property
+    def score_display(self) -> float:
+        """Human-readable score — divide internal hundredths back to points."""
+        return self.score / 100
+
 
 class GameState:
     def __init__(self) -> None:
@@ -62,7 +67,7 @@ class GameState:
         self.log("Quiz finished!")
         medals = ("1st", "2nd", "3rd", "4th")
         for i, p in enumerate(self.ranking()):
-            self.log(f"  {medals[min(i,3)]}  {p.name}: {p.score} pts")
+            self.log(f"  {medals[min(i,3)]}  {p.name}: {p.score_display:g} pts")
 
     # ── Actions ───────────────────────────────────────────────────────────────
 
@@ -94,13 +99,13 @@ class GameState:
         self.log(f"Button {button_index}: '{old}' -> '{name}'")
         return True
 
-    def adjust_score(self, name: str, delta: int) -> bool:
+    def adjust_score(self, name: str, delta: float) -> bool:
         p = self.player_by_name(name)
         if not p:
             return False
-        p.score += delta
+        p.score += round(delta * 100)   # store as integer hundredths to avoid float issues
         sign = "+" if delta >= 0 else ""
-        self.log(f"{p.name}: {sign}{delta}  ->  {p.score} pts")
+        self.log(f"{p.name}: {sign}{delta}  ->  {p.score:g} pts")
         return True
 
     def ranking(self) -> list[Player]:

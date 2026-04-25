@@ -51,9 +51,10 @@ def process(game: GameState, cmd: str) -> None:
         return
 
     # ── <Name> +N / -N  e.g. "Alice +1", "Bob -2" ───────────────────────────
-    m = re.match(r'^(.+?)\s*([+-]\d+)\s*$', raw)
+    m = re.match(r'^(.+?)\s*([+-]\d+[.,]?\d*)\s*$', raw)
     if m:
-        name, delta = m.group(1).strip(), int(m.group(2))
+        name = m.group(1).strip()
+        delta = float(m.group(2).replace(",", "."))
         if not game.adjust_score(name, delta):
             game.log(f"Player '{name}' not found.")
         return
