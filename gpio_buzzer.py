@@ -55,7 +55,7 @@ def setup_gpio(game: GameState) -> bool:
     # buzz = TonalBuzzer(TONE_PIN) piezo buzzer
 
     for i, pin in enumerate(BUZZER_PINS):
-        btn = Button(pin, pull_up=True)
+        btn = Button(pin)
         player_index = i + 1   # 1-based
 
         def make_press_cb(idx, led, bzr = None):
