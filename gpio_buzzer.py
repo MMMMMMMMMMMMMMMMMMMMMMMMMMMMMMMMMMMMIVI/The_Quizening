@@ -22,7 +22,7 @@ _buttons = []   # keep references alive so gpiozero doesn't GC them
 
 BUZZER_PINS = [25, 16, 20, 21]   # BCM pin numbers, one per player
 LED_PINS    = [6,  13, 19, 26]   # matching LEDs (one per buzzer)
-TONE_PIN = 18
+# TONE_PIN = 18 piezo buzzer
 PLAYER_TONES = {
     1: 494,# B4
     2: 523,# C5
@@ -43,16 +43,16 @@ def setup_gpio(game: GameState) -> bool:
         return False
 
     leds = [PWMLED(pin) for pin in LED_PINS]
-    buzz = TonalBuzzer(TONE_PIN)
+    # buzz = TonalBuzzer(TONE_PIN) piezo buzzer
 
     for i, pin in enumerate(BUZZER_PINS):
         btn = Button(pin, pull_up=True)
         player_index = i + 1   # 1-based
 
-        def make_press_cb(idx, led, bzr):
+        def make_press_cb(idx, led, bzr = None):
             def on_press():
                 game.buzz_queue.put(idx)   # thread-safe
-                beep(bzr, frequency=PLAYER_TONES[idx], duration=0.15)
+                # beep(bzr, frequency=PLAYER_TONES[idx], duration=0.15) piezo buzzer
                 blinkini(led, on_time=0.05, off_time=0.05, n=3)
             return on_press
         
@@ -61,7 +61,7 @@ def setup_gpio(game: GameState) -> bool:
                 led.off()   # ensure it ends up off
             return on_release
 
-        btn.when_pressed  = make_press_cb(player_index, leds[i], buzz)
+        btn.when_pressed  = make_press_cb(player_index, leds[i])
         btn.when_released = make_release_cb(leds[i])
         _buttons.append(btn)
 
@@ -74,13 +74,13 @@ def teardown_gpio() -> None:
         btn.close()
     _buttons.clear()
 
-
-def beep(buzzer, frequency=440, duration=0.15):
-    def _run():
-        buzzer.play(frequency)
-        threading.Event().wait(duration)
-        buzzer.stop()
-    threading.Thread(target=_run, daemon=True).start()
+# Piezo buzzer
+# def beep(buzzer, frequency=440, duration=0.15):
+#     def _run():
+#         buzzer.play(frequency)
+#         threading.Event().wait(duration)
+#         buzzer.stop()
+#     threading.Thread(target=_run, daemon=True).start()
 
 def blinkini(led, on_time=0.05, off_time=0.05, n=3) -> None:
     """Software blink — works on any GPIO pin, no PWM required."""
