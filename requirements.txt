@@ -1,3 +1,6 @@
+numpy
+sounddevice
+
 # ── Windows only ─────────────────────────────────────────────────────────────
 # curses is built into Python on Linux/macOS but missing on Windows.
 # Install this when developing on Windows; do NOT install it on the Pi.

@@ -18,6 +18,8 @@ from __future__ import annotations
 from game import GameState
 import threading
 import pygame
+import sounddevice as sd
+import numpy as np
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
@@ -29,13 +31,13 @@ BUZZER_PINS = [25, 16, 20, 21]   # BCM pin numbers, one per player
 LED_PINS    = [6,  13, 19, 26]   # matching LEDs (one per buzzer)
 """
 TONE_PIN = 18 piezo buzzer
+"""
 PLAYER_TONES = {
     1: 494,# B4
     2: 523,# C5
     3: 659,# E5
     4: 784,# G5
     }
-"""
 
 
 def setup_gpio(game: GameState) -> bool:
@@ -59,7 +61,8 @@ def setup_gpio(game: GameState) -> bool:
         def make_press_cb(idx, led, bzr = None):
             def on_press():
                 game.buzz_queue.put(idx)   # thread-safe
-                sound.play()
+                play_tone(freq=PLAYER_TONES[idx], duration=0.15)
+                #sound.play()
                 # beep(bzr, frequency=PLAYER_TONES[idx], duration=0.15) piezo buzzer
                 blinkini(led, on_time=0.05, off_time=0.05, n=3)
             return on_press
@@ -101,3 +104,8 @@ def blinkini(led, on_time=0.05, off_time=0.05, n=3) -> None:
             led.off()
             threading.Event().wait(off_time)
     threading.Thread(target=_run, daemon=True).start()
+
+def play_tone(freq=523, duration=0.15, fs=44100):
+    t = np.linspace(0, duration, int(fs * duration), False)
+    wave = (np.sin(2 * np.pi * freq * t) * 0.5).astype(np.float32)
+    sd.play(wave, fs, blocking=False)
