@@ -47,11 +47,11 @@ def setup_gpio(game: GameState) -> bool:
     """
     global _buttons
     try:
-        from gpiozero import Button, PWMLED, TonalBuzzer
+        from gpiozero import Button, LED, TonalBuzzer
     except Exception:
         return False
 
-    leds = [PWMLED(pin) for pin in LED_PINS]
+    leds = [LED(pin) for pin in LED_PINS]
     # buzz = TonalBuzzer(TONE_PIN) piezo buzzer
 
     for i, pin in enumerate(BUZZER_PINS):
